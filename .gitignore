@@ -160,3 +160,5 @@ cython_debug/
 #.idea/
 
 raw_data/
+
+Agricultural_Market_Predictions/Agricultural_data/
