@@ -13,9 +13,6 @@ df['date'] = pd.to_datetime(df['date'])
 # Remove the year 2023
 df = df[df['date'].dt.year != 2023]
 
-# Convert 'price_soybean' to numeric
-df['price_soybean'] = pd.to_numeric(df['price_soybean'], errors='coerce')
-
 # Create lag columns
 df['previous_price_soybean'] = df['price_soybean'].shift(1)
 df['previous_usa_production'] = df['SOYBEANS - USA PRODUCTION [mTons]'].shift(6)
