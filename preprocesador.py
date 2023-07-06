@@ -5,7 +5,10 @@ from sklearn.preprocessing import MinMaxScaler
 # Select the desired columns
 df = df[['date', 'price_soybean', 'real_interest_rate', 'SP500', 'SOYBEANS - USA PRODUCTION [mTons]']]
 
-selected_columns = ['real_interest_rate', 'SP500', 'SOYBEANS - USA PRODUCTION [mTons]']
+## selected_columns = ['real_interest_rate', 'SP500', 'SOYBEANS - USA PRODUCTION [mTons]'] se utilizará abajo para escalar todas las features
+
+# Rename column USA Production
+df = df.rename(columns={'SOYBEANS - USA PRODUCTION [mTons]': 'usa_prod'})
 
 # Convert 'date' column to datetime
 df['date'] = pd.to_datetime(df['date'])
@@ -14,7 +17,7 @@ df['date'] = pd.to_datetime(df['date'])
 df = df[df['date'].dt.year != 2023]
 
 # Create lag columns
-df['previous_price_soybean'] = df['price_soybean'].shift(1)
+""" df['previous_price_soybean'] = df['price_soybean'].shift(1)
 df['previous_usa_production'] = df['SOYBEANS - USA PRODUCTION [mTons]'].shift(6)
 df['previous_SP500'] = df['SP500'].shift(1)
 df['previous_real_interest_rate'] = df['real_interest_rate'].shift(1)
@@ -26,7 +29,28 @@ df['3mprevious_SP500'] = df['SP500'].shift(3)
 df['3mprevious_real_interest_rate'] = df['real_interest_rate'].shift(6)
 df['6mprevious_price_soybean'] = df['price_soybean'].shift(6)
 df['6mprevious_SP500'] = df['SP500'].shift(6)
-df['6mprevious_real_interest_rate'] = df['real_interest_rate'].shift(6)
+df['6mprevious_real_interest_rate'] = df['real_interest_rate'].shift(6) """
+
+# Function to create lag columns
+# Reference: https://github.com/guptapiyush340/Soybean-Price-Prediction-Winning-solution-MinneAnalytics-Data-Science-Challenge/blob/master/XGBoost%20-%20Final%20Model.ipynb
+
+def new_lags(data, lag_soybean_price, steps):
+    ##Para 1 mes
+    lag_col= ['price_soybean', 'real_interest_rate', 'SP500', 'usa_prod']
+    t = 1
+    data=data.assign(**{'{} (t-{})'.format(col, t): data[col].shift(+t) for col in lag_col})
+    ##Para 3 y 6 meses
+    lags = range(3, lag_soybean_price, steps)
+    data=data.assign(**{
+        '{} (t-{})'.format(col, t): data[col].shift(+t)
+        for t in lags
+        for col in lag_col
+    })
+
+    return data
+
+# Instantiate the function to add the labels --> 1, 3 and 6 months
+df = new_lags(df, lag_soybean_price = 7, steps = 3)
 
 # Extract month and year
 df['month'] = df['date'].dt.month
@@ -38,10 +62,16 @@ df['month_cos'] = np.cos(2 * np.pi * df['month'] / 12)
 df['year_sin'] = np.sin(2 * np.pi * df['year'] / df['year'].max())
 df['year_cos'] = np.cos(2 * np.pi * df['year'] / df['year'].max())
 
+# Drop date columns
+df = df.drop(columns=['date'], axis=1)
+
 # Fill null values with rolling median and backfill remaining nulls
 rolling_median = df.rolling(window=12, min_periods=1).median()
 df_filled = df.fillna(rolling_median)
 df = df_filled.fillna(method='bfill')
+
+# Select all features except soybean price
+selected_columns = [df.columns.tolist()[i] for i in range(1, df.shape[1])]
 
 # Scale selected columns using MinMaxScaler
 scaler = MinMaxScaler()
