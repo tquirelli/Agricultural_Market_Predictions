@@ -16,6 +16,16 @@ df['date'] = pd.to_datetime(df['date'])
 # Remove the year 2023
 df = df[df['date'].dt.year != 2023]
 
+# Select rows based on condition of date since 01-2005
+df = df.loc[(df['date'] >= '2005-01-01')]
+
+# Choose 90% of the rows randomly
+df = df.sample(frac=0.9, random_state=42)
+
+# Scale usa_prod and SP500 by minimum value
+df['usa_prod'] = df['usa_prod'] / df['usa_prod'].min()
+df['SP500'] = df['SP500'] / df['SP500'].min()
+
 # Create lag columns
 """ df['previous_price_soybean'] = df['price_soybean'].shift(1)
 df['previous_usa_production'] = df['SOYBEANS - USA PRODUCTION [mTons]'].shift(6)
@@ -52,6 +62,11 @@ def new_lags(data, lag_soybean_price, steps):
 # Instantiate the function to add the labels --> 1, 3 and 6 months
 df = new_lags(df, lag_soybean_price = 7, steps = 3)
 
+# Scale soybean prices for 1, 3 and 6 months
+df['price_soybean (t-1)'] = df['price_soybean (t-1)'] / df['price_soybean (t-1)'].min()
+df['price_soybean (t-3)'] = df['price_soybean (t-3)'] / df['price_soybean (t-3)'].min()
+df['price_soybean (t-6)'] = df['price_soybean (t-6)'] / df['price_soybean (t-6)'].min()
+
 # Extract month and year
 df['month'] = df['date'].dt.month
 df['year'] = df['date'].dt.year
@@ -59,23 +74,20 @@ df['year'] = df['date'].dt.year
 # Create cyclic features using sine and cosine transformations
 df['month_sin'] = np.sin(2 * np.pi * df['month'] / 12)
 df['month_cos'] = np.cos(2 * np.pi * df['month'] / 12)
-df['year_sin'] = np.sin(2 * np.pi * df['year'] / df['year'].max())
-df['year_cos'] = np.cos(2 * np.pi * df['year'] / df['year'].max())
+# df['year_sin'] = np.sin(2 * np.pi * df['year'] / df['year'].max())
+# df['year_cos'] = np.cos(2 * np.pi * df['year'] / df['year'].max())
 
 # Drop date columns
-df = df.drop(columns=['date'], axis=1)
+df = df.drop(columns=['date', 'month'], axis=1)
 
 # Fill null values with rolling median and backfill remaining nulls
 rolling_median = df.rolling(window=12, min_periods=1).median()
 df_filled = df.fillna(rolling_median)
 df = df_filled.fillna(method='bfill')
 
-# Select all features except soybean price
-selected_columns = [df.columns.tolist()[i] for i in range(1, df.shape[1])]
-
 # Scale selected columns using MinMaxScaler
-scaler = MinMaxScaler()
-df[selected_columns] = scaler.fit_transform(df[selected_columns])
+# scaler = MinMaxScaler()
+# df[selected_columns] = scaler.fit_transform(df[selected_columns])
 
 # Check for any remaining null values
 num_null_rows = df.isnull().sum(axis=1).sum()
