@@ -8,7 +8,7 @@ df = df[['date', 'price_soybean', 'real_interest_rate', 'SP500', 'SOYBEANS - USA
 selected_columns = ['real_interest_rate', 'SP500', 'SOYBEANS - USA PRODUCTION [mTons]']
 
 # Convert 'date' column to datetime
-df['date'] = pd.to_datetime(df['date'])
+df['date'] = pd.to_datetime(df['date'b])
 
 # Remove the year 2023
 df = df[df['date'].dt.year != 2023]
@@ -37,6 +37,9 @@ df['month_sin'] = np.sin(2 * np.pi * df['month'] / 12)
 df['month_cos'] = np.cos(2 * np.pi * df['month'] / 12)
 df['year_sin'] = np.sin(2 * np.pi * df['year'] / df['year'].max())
 df['year_cos'] = np.cos(2 * np.pi * df['year'] / df['year'].max())
+
+# Replace 0 values in 'price_soybean' column with the next positive value
+df['price_soybean'] = df['price_soybean'].replace(0, np.nan).ffill()
 
 # Fill null values with rolling median and backfill remaining nulls
 rolling_median = df.rolling(window=12, min_periods=1).median()
