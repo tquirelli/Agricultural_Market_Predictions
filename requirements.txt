@@ -22,6 +22,7 @@ defusedxml==0.7.1
 dill==0.3.6
 exceptiongroup==1.1.1
 executing==1.2.0
+fastapi==0.100.0
 fastjsonschema==2.17.1
 fonttools==4.40.0
 fqdn==1.5.1
