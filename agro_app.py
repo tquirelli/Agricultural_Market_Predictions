@@ -1,7 +1,7 @@
 import streamlit as st
-
+from model import predict
 
 year = st.text_input("Year","")
 
 
-st.text(f"Bienvenido {year})
+st.text(predict(year))
