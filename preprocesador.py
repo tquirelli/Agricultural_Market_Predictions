@@ -41,7 +41,7 @@ def all_preprocessor(df) -> pd.DataFrame:
     df = df.loc[(df['date'] >= '2008-01-01')]
 
     # Choose 90% of the rows randomly
-    df = df.sample(frac=0.9, random_state=42)
+    # df = df.sample(frac=0.9, random_state=42)
 
     # Scale usa_prod and SP500 by minimum value
     df['usa_prod'] = df['usa_prod'] / df['usa_prod'].min()
@@ -79,6 +79,6 @@ def all_preprocessor(df) -> pd.DataFrame:
     df['date'] = date_column
 
     # To save the dataframe in the dataser folder
-    # df.to_csv("Agricultural_data/scaled_data.csv", index=False)
+    df.to_csv("Agricultural_data/scaled_data.csv", index=False)
 
     return df
