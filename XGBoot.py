@@ -11,3 +11,6 @@ def initialize_train_model():
 def mape_score():
     mape = make_scorer(lambda y_true, y_pred: mean_absolute_percentage_error(y_true, y_pred))
     return mape
+
+def MAPE_validation(y_train, y_train_predict):
+    return round(mean_absolute_percentage_error(y_train,y_train_predict),2)

@@ -3,23 +3,40 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score
 import seaborn as sns
-from preprocesador import all_preprocessor
-from XGBoot import initialize_train_model, mape_score
+import pickle
+from dateutil.relativedelta import relativedelta
+from preprocesador import all_preprocessor, all_preprocessor_train
+from XGBoot import initialize_train_model, mape_score, MAPE_validation
+# from main_local import input_usuario, predict_xgboost
 
-LOCAL_PATH = 'Agricultural_data/consolidado_final.csv'
+LOCAL_PATH = 'Agricultural_data/consolidado_final1.csv'
 consolidado = pd.read_csv(LOCAL_PATH)
 
+def get_current_date(N_month_predict):
+    Current_date = pd.Timestamp.now()
+    New_date = Current_date + relativedelta(months=N_month_predict)
+    month = New_date.month
+    year = New_date.year
+    print("Mes a predecir:", month)
+    print("Año a predecir:", year)
+    return int(month), int(year)
 
-def input_usuario(month_date:int = 2, year_date:int = 2022, consolidado:pd.DataFrame = consolidado):
+
+def input_usuario(N_month_predict:int, consolidado:pd.DataFrame = consolidado):
     # verificar que se encuentre en la base de datos
-    df = all_preprocessor(consolidado)
-    date = pd.to_datetime(f'{year_date}-{month_date:02d}-01')
+    df = all_preprocessor(consolidado) # preprocesando el dataframe completo
+    month_date, year_date = get_current_date(N_month_predict) # obteniendo mes y año actual
+    #date = pd.to_datetime(f'{year_date}-{month_date:02d}-01')
+    # Sumar los meses a la fecha actual utilizando relativedelta
+
+    date = pd.to_datetime(f'{year_date}-{month_date}-01')
+    print(date)
     if date in df['date'].values:
         filtered_df = df[df['date'].dt.month == month_date]
         filtered_df = filtered_df[filtered_df['date'].dt.year == year_date]
         print(f"✅ data is valid")
-        print(filtered_df)
-        return filtered_df
+        print(filtered_df['date'])
+        return filtered_df, N_month_predict
     else:
         print(f"❌ data is not valid, please try again")
         return "❌ data is not valid, please try again"
@@ -36,46 +53,76 @@ def feature_selection(df, N_month_predict):
     Variables['X_{}'.format(N_month_predict)] = df[Selected_features]
     return Variables
 
-def train_xgboost(consolidado:pd.DataFrame = consolidado, filtered_df = None) -> pd.DataFrame:
-    df = all_preprocessor(consolidado)
-    # Defining test and train size
-    # df_train = df[df.date<="2017-12-01"]
-    # df_test = df[df.date>="2018-01-01"]
+def train_xgboost(N_month_predict, consolidado:pd.DataFrame = consolidado) -> pd.DataFrame:
+    df = all_preprocessor_train(consolidado)
     # Choose 90% of the rows randomly
-    df = df.sample(frac=0.9, random_state=42)
+    # df = df.sample(frac=0.9, random_state=42)
     df = df.drop(columns=['date'], axis=1)
     Scores = {}
     Results = {}
-    User_results = {}
-    N_month_predict = 3 # Choice between 3 and 6
-
-    Variables = feature_selection(df, N_month_predict)
-    y_log = Variables['y_{}'.format(N_month_predict)]
-    X = Variables['X_{}'.format(N_month_predict)]
+    # Seleccionando features de acuerdo a cuántos meses se va a predecir
+    selection = feature_selection(df, N_month_predict)
+    y_log = selection['y_{}'.format(N_month_predict)]
+    X = selection['X_{}'.format(N_month_predict)]
     X_train, X_test, y_train_log, y_test_log = train_test_split(X,y_log,test_size=0.3,random_state=42)
     model_init = initialize_train_model()
-
-    score = cross_val_score(model_init,X,y_log,cv=5,scoring=mape_score(),n_jobs=-1).mean()
-    initialize_train_model, mape_score
+    # Chequear el mape score del target y original --> aplicando la exponencial al logaritmo
+    score = cross_val_score(model_init,X,np.exp(y_log),cv=15,scoring=mape_score(),n_jobs=-1).mean()
     Scores['cross_val_score_{}'.format(N_month_predict)] = score
-    model_init.fit(X_train, y_train_log,
-        verbose=False,
-        eval_set=[(X_train, y_train_log)],
-        eval_metric=["mape"],
-        early_stopping_rounds=10)
+    model = model_init.fit(X_train, y_train_log,
+                           verbose=False,
+                           eval_set=[(X_train, y_train_log)],
+                           eval_metric=["mape"],
+                           early_stopping_rounds=10)
     Results['y_predict_{}'.format(N_month_predict)] = np.exp(model_init.predict(X_test))
     Results['y_test_{}'.format(N_month_predict)] = np.exp(y_test_log)
-    filtered_df = input_usuario()
-    filtered_df = filtered_df.drop(columns=['date'], axis=1)
-    features = X.columns
-    User_results['y_predict_{}'.format(N_month_predict)] = np.exp(model_init.predict(filtered_df[features]))
-    print(User_results)
+    results = pd.DataFrame.from_dict(Results)
+    # Chequear el mape score con los resultados --> y_test, y_predict
+    mape_validation = MAPE_validation(Results['y_predict_{}'.format(N_month_predict)],
+                                      Results['y_test_{}'.format(N_month_predict)])
+    # print(results)
+    print(Scores)
+    print("MAPE Validation {}: ".format(N_month_predict), mape_validation)
+    # Saving XGBoot Model
+    save_xgboot_model(model, N_month_predict)
+    return model
+
+def save_xgboot_model(model, N_month_predict):
+    with open('model_XGBoost_{}'.format(N_month_predict), 'wb') as archivo:
+        pickle.dump(model, archivo)
+    print("Modelo XGBoost guardado ✅.")
+
+
+def predict_xgboost(filtered_df, N_month_predict):
+    #if meses --> cargar modelo
+    User_results = {}
+    try:
+        with open('model_XGBoost_{}'.format(N_month_predict), 'rb') as archivo:
+            load_model = pickle.load(archivo)
+        print("Modelo XGBoost cargado exitosamente ✅.")
+        filtered_df = filtered_df.drop(columns=['date'], axis=1)
+        selection = feature_selection(filtered_df, N_month_predict)
+        X = selection['X_{}'.format(N_month_predict)]
+        features = X.columns
+        User_results['y_predict_{}'.format(N_month_predict)] = np.exp(load_model.predict(filtered_df[features]))
+        print(X)
+        price_soybean_result = User_results['y_predict_{}'.format(N_month_predict)][0]
+        print("El precio de la soja dentro de {} meses será de $: ".format(N_month_predict),price_soybean_result)
+        return price_soybean_result
+
+    except FileNotFoundError:
+        train_xgboost(N_month_predict, consolidado)
 
 
 
 if __name__ == '__main__':
     try:
-        train_xgboost()
+        LOCAL_PATH = 'Agricultural_data/consolidado_final1.csv'
+        consolidado = pd.read_csv(LOCAL_PATH)
+        N_month_predict = 3
+        filtered_df, N_month_predict = input_usuario(N_month_predict, consolidado)
+        predict_xgboost(filtered_df, N_month_predict)
+        #train_xgboost(N_month_predict, consolidado)
 
     except:
         import sys
