@@ -8,7 +8,7 @@ import os
 from dateutil.relativedelta import relativedelta
 from preprocesador import all_preprocessor, all_preprocessor_train
 from XGBoot import initialize_train_model, mape_score, MAPE_validation
-# from main_local import input_usuario, predict_xgboost
+
 
 LOCAL_PATH = 'Agricultural_data/consolidado_final1.csv'
 script_path = os.path.dirname(__file__)
@@ -130,7 +130,6 @@ if __name__ == '__main__':
         N_month_predict = 3
         filtered_df, N_month_predict = input_usuario(N_month_predict, consolidado)
         predict_xgboost(filtered_df, N_month_predict)
-        #train_xgboost(N_month_predict, consolidado)
 
     except:
         import sys
