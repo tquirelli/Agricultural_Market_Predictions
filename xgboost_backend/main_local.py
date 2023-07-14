@@ -4,12 +4,16 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score
 import seaborn as sns
 import pickle
+import os
 from dateutil.relativedelta import relativedelta
 from preprocesador import all_preprocessor, all_preprocessor_train
 from XGBoot import initialize_train_model, mape_score, MAPE_validation
 # from main_local import input_usuario, predict_xgboost
 
 LOCAL_PATH = 'Agricultural_data/consolidado_final1.csv'
+script_path = os.path.dirname(__file__)
+csv_path = os.path.join(script_path, "..", LOCAL_PATH)
+
 consolidado = pd.read_csv(LOCAL_PATH)
 
 def get_current_date(N_month_predict):
@@ -88,7 +92,8 @@ def train_xgboost(N_month_predict, consolidado:pd.DataFrame = consolidado) -> pd
     return model
 
 def save_xgboot_model(model, N_month_predict):
-    with open('model_XGBoost_{}'.format(N_month_predict), 'wb') as archivo:
+    model_path = os.path.join(script_path, 'model_XGBoost_{}'.format(N_month_predict))
+    with open(model_path, 'wb') as archivo:
         pickle.dump(model, archivo)
     print("Modelo XGBoost guardado ✅.")
 
@@ -97,7 +102,8 @@ def predict_xgboost(filtered_df, N_month_predict):
     #if meses --> cargar modelo
     User_results = {}
     try:
-        with open('model_XGBoost_{}'.format(N_month_predict), 'rb') as archivo:
+        model_path = os.path.join(script_path, 'model_XGBoost_{}'.format(N_month_predict))
+        with open(model_path, 'rb') as archivo:
             load_model = pickle.load(archivo)
         print("Modelo XGBoost cargado exitosamente ✅.")
         filtered_df = filtered_df.drop(columns=['date'], axis=1)
@@ -118,7 +124,9 @@ def predict_xgboost(filtered_df, N_month_predict):
 if __name__ == '__main__':
     try:
         LOCAL_PATH = 'Agricultural_data/consolidado_final1.csv'
-        consolidado = pd.read_csv(LOCAL_PATH)
+        script_path = os.path.dirname(__file__)
+        csv_path = os.path.join(script_path, "..", LOCAL_PATH)
+        consolidado = pd.read_csv(csv_path)
         N_month_predict = 3
         filtered_df, N_month_predict = input_usuario(N_month_predict, consolidado)
         predict_xgboost(filtered_df, N_month_predict)
