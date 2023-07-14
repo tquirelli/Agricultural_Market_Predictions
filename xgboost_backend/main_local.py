@@ -7,14 +7,14 @@ import pickle
 import os
 from dateutil.relativedelta import relativedelta
 from preprocesador import all_preprocessor, all_preprocessor_train
-from XGBoot import initialize_train_model, mape_score, MAPE_validation
+from XGBoost import initialize_train_model, mape_score, MAPE_validation
 
 
 LOCAL_PATH = 'Agricultural_data/consolidado_final1.csv'
 script_path = os.path.dirname(__file__)
 csv_path = os.path.join(script_path, "..", LOCAL_PATH)
 
-consolidado = pd.read_csv(LOCAL_PATH)
+consolidado = pd.read_csv(csv_path)
 
 def get_current_date(N_month_predict):
     Current_date = pd.Timestamp.now()

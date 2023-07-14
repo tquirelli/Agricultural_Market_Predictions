@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-#LOCAL_PATH = 'Agricultural_data/consolidado_final.csv'
+#LOCAL_PATH = 'Agricultural_data/consolidado_final1.csv'
 #df = pd.read_csv(LOCAL_PATH)
 
 # Function to create lag columns
@@ -79,7 +79,7 @@ def all_preprocessor(df) -> pd.DataFrame:
     df['date'] = date_column
 
     # To save the dataframe in the dataser folder
-    df.to_csv("Agricultural_data/scaled_data.csv", index=False)
+    #df.to_csv("Agricultural_data/scaled_data.csv", index=False)
 
     return df
 
