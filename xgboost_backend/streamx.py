@@ -1,8 +1,15 @@
 import streamlit as st
 from modelx import predict_price
+import matplotlib.pyplot as plt
+import pandas as pd
+import datetime
+from actual_price import last_price, last_date
+
+
 
 # Streamlit app code
 st.title("Soybean Price Prediction")
+st.title(f'Last month price from {last_date} is ${int(last_price)}')
 
 if st.button("1 Month"):
     prediction_horizon = "1 Month"

@@ -1,7 +1,10 @@
 from main_local import input_usuario, predict_xgboost
 import pandas as pd
 import os
-
+import yfinance as yf
+from graphs import plt
+import datetime
+import streamlit as st
 
 
 def predict_price(time_horizon):
@@ -10,7 +13,7 @@ def predict_price(time_horizon):
 
     if time_horizon == "1 Month":
 
-        return "Welcome to the 1 Month prediction"
+        return "En desarrollo"
 
     elif time_horizon == "3 Months":
 
@@ -21,6 +24,10 @@ def predict_price(time_horizon):
         N_month_predict = 3
         filtered_df, N_month_predict = input_usuario(N_month_predict, consolidado)
         result = predict_xgboost(filtered_df, N_month_predict)
+
+
+
+
 
         return result
 
