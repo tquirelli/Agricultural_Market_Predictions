@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# csv extensions
+*.csv
+
 # Distribution / packaging
 .Python
 build/
@@ -159,5 +162,4 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-# contain data sets
-raw_data/ 
+raw_data/
