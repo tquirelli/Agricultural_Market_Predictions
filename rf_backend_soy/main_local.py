@@ -3,14 +3,12 @@ import numpy as np
 import pickle
 import os
 from sklearn.model_selection import cross_val_score
-from rf_backend_soy.preprocesador_rf import all_preprocessor
+from .preprocesador_rf import all_preprocessor
 from rf_backend_soy.RandomForest import initialize_rf, mape_score
 from dateutil.relativedelta import relativedelta
 
-LOCAL_PATH = 'Agricultural_data/consolidado_final.csv'
-script_path = os.path.dirname(__file__)
-csv_path = os.path.join(script_path, "..", LOCAL_PATH)
-consolidado = pd.read_csv(LOCAL_PATH,parse_dates=["date"],header=0)
+LOCAL_PATH_rf = '/home/simon/code/tquirelli/Agricultural_Market_Predictions/Agricultural_data/consolidado_final.csv'
+consolidado_rf = pd.read_csv(LOCAL_PATH_rf)
 
 def get_new_date(N_month_predict):
     Current_date = pd.Timestamp.now()
@@ -27,7 +25,7 @@ def get_current_date():
     year = Current_date.year
     return int(month), int(year)
 
-def input_usuario(N_month_predict:int, consolidado:pd.DataFrame = consolidado):
+def input_usuario(N_month_predict, consolidado):
     # verificar que se encuentre en la base de datos
     df = all_preprocessor(consolidado) # preprocesando el dataframe completo
     month_date, year_date = get_new_date(N_month_predict) # obteniendo mes y año actual
@@ -45,7 +43,7 @@ def input_usuario(N_month_predict:int, consolidado:pd.DataFrame = consolidado):
         print(f"❌ data is not valid, please try again")
         return "❌ data is not valid, please try again"
 
-def train_rf(consolidado:pd.DataFrame = consolidado) -> pd.DataFrame:
+def train_rf(consolidado) -> pd.DataFrame:
     df = all_preprocessor(consolidado)
 
     #Scores = {}
@@ -84,7 +82,7 @@ def train_rf(consolidado:pd.DataFrame = consolidado) -> pd.DataFrame:
     return model
 
 def save_rf_model(model):
-    model_path = os.path.join(script_path, 'model_rf')
+    model_path = '/home/simon/code/tquirelli/Agricultural_Market_Predictions/rf_backend_soy/model_rf'
     with open(model_path, 'wb') as archivo:
         pickle.dump(model, archivo)
     print("Modelo RF guardado ✅.")
@@ -94,7 +92,7 @@ def predict_rf(filtered_df, N_month_predict):
     #if meses --> cargar modelo
     User_results = {}
     try:
-        model_path = os.path.join(script_path, 'model_rf')
+        model_path = '/home/simon/code/tquirelli/Agricultural_Market_Predictions/rf_backend_soy/model_rf'
         with open(model_path, 'rb') as archivo:
             load_model = pickle.load(archivo)
         print("Modelo RF cargado exitosamente ✅.")
@@ -106,15 +104,18 @@ def predict_rf(filtered_df, N_month_predict):
         return price_soybean_result
 
     except FileNotFoundError:
+        consolidado = '/home/simon/code/tquirelli/Agricultural_Market_Predictions/Agricultural_data/consolidado_final.csv'
         train_rf(consolidado)
 
 ###
 
+'''
 if __name__ == '__main__':
     try:
         LOCAL_PATH = 'Agricultural_data/consolidado_final.csv'
         script_path = os.path.dirname(__file__)
         csv_path = os.path.join(script_path, "..", LOCAL_PATH)
+        #csv_path ='/home/simon/code/tquirelli/Agricultural_Market_Predictions/Agricultural_data/consolidado_final.csv'
         consolidado = pd.read_csv(csv_path,parse_dates=["date"],header=0)
         N_month_predict = 1
         filtered_df, N_month_predict = input_usuario(N_month_predict, consolidado)
@@ -127,4 +128,5 @@ if __name__ == '__main__':
         import ipdb
         extype, value, tb = sys.exc_info()
         traceback.print_exc()
-        ipdb.post_mortem(tb)
+        ipdb.post_mortem(tb) 
+'''

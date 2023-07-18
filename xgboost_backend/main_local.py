@@ -1,18 +1,35 @@
 import pandas as pd
 import numpy as np
+from sklearn.metrics import make_scorer, mean_absolute_percentage_error
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score
 import seaborn as sns
 import pickle
 import os
 from dateutil.relativedelta import relativedelta
-from preprocesador import all_preprocessor, all_preprocessor_train
-from XGBoot import initialize_train_model, mape_score, MAPE_validation
+from xgboost import XGBRegressor
+from .preprocesador import all_preprocessor, all_preprocessor_train
 
 
-LOCAL_PATH = 'Agricultural_data/consolidado_final1.csv'
+
+def initialize_train_model():
+    # Instanciate model
+    model_xgb = XGBRegressor(max_depth=10, n_estimators=300, learning_rate=0.1)
+    return model_xgb
+
+def mape_score():
+    mape = make_scorer(lambda y_true, y_pred: mean_absolute_percentage_error(y_true, y_pred))
+    return mape
+
+def MAPE_validation(y_train, y_train_predict):
+    return round(mean_absolute_percentage_error(y_train,y_train_predict),2)
+
+
+
+LOCAL_PATH = '/home/simon/code/tquirelli/Agricultural_Market_Predictions/Agricultural_data/consolidado_final1.csv'
 script_path = os.path.dirname(__file__)
-csv_path = os.path.join(script_path, "..", LOCAL_PATH)
+#csv_path = os.path.join(script_path,LOCAL_PATH)
+
 
 consolidado = pd.read_csv(LOCAL_PATH)
 

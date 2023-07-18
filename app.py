@@ -2,38 +2,63 @@ import streamlit as st
 import requests
 import numpy as np
 import pandas as pd
-from fast import predict
-
-st.markdown("""# This is a header
-## This is a sub header
-This is text""")
-
-Number_one = st.number_input('Number One')
-Number_two = st.number_input('Number Two')
-Number_three = st.number_input('Number three')
+import streamlit as st
+from xgboost_backend.XGBoot import predict_price
+from PIL import Image
+import base64
+import streamlit as st
 
 
-params ={
-    'Number_one': f'{Number_one}',
-    "Number_two": f'{Number_two}',
-    'Number_three': f'{Number_three}',
-}
+
+st.set_page_config(
+    page_title="Agricultural Market Prediction",
+    page_icon="🌐",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+st.markdown(
+    """
+    <style>
+    body {
+        background-image:url('https://www.infocampo.com.ar/wp-content/uploads/2020/01/agricultura-soja-infocampo.jpg');
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+
+    .main-container {
+        padding: 4rem;
+        color: white;
+        text-align: center;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 
-url = f'http://127.0.0.1:8000/?Number_one={Number_one}&Number_two={Number_two}&Number_three={Number_three}'
 
+st.title("Soybean Price Prediction")
 
-if st.button('click me'):
+if st.button("1 Month"):
+    time_horizon = "1 Month"
+    params = {'time_horizon': time_horizon}
+    url_rf='http://127.0.0.1:8000/predict_1'
+    prediction_rf = requests.get(url_rf,params=params).json()
+    st.header(f'Future Price in a Month:¢/bu {round(prediction_rf,2)}')
+
+if st.button("3 Months"):
+    time_horizon = "3 Months"
+    params = {'time_horizon': time_horizon}
+    url_xg='http://127.0.0.1:8000/predict_3_6'
+    prediction_xg = requests.get(url_xg,params=params).json()
+    st.header(f'Future Price in three Month:¢/bu {prediction_xg}')
     
-    response = requests.get(url,params=params)
+if st.button("6 Months"):
+    time_horizon = "6 Months"
+    params = {'time_horizon': time_horizon}
+    url_xg='http://127.0.0.1:8000/predict_3_6'
+    prediction_xg = requests.get(url_xg,params=params).json()
+    st.header(f'Future Price in six Month:¢/bu {(prediction_xg)}')
     
-    price = response.json()['Estimate_price']
-    #print(price)
-    st.header(f'Estimate Price: ${round(price, 2)}')
-    #st.header(f"Estimate price: ${round(price['Estimate_price'], 2)}")
-        # print is visible in the server output, not in the page
-    print('button clicked!')
-    st.write('I was clicked 🎉')
-    st.write('Further clicks are not visible but are executed')
-else:
-    st.write('I was not clicked 😞')
+
