@@ -3,25 +3,23 @@ import pandas as pd
 import datetime
 import yfinance as yf
 
-# Set the ticker symbol for soybean futures
-ticker = "ZS=F"
+#ticker_soy ticker="ZS=F"
+#ticker_corn="ZC=F"
 
-# Fetch the historical data for soybean futures
-data = yf.download(ticker, period="2y",interval="1mo")
+def actualprice(tickers):
+    ticker = tickers
 
-# Get the last date and its corresponding price
-ld = data.index[-1]
+    # Fetch the historical data for soybean futures
+    data = yf.download(ticker, period="2y",interval="1mo")
 
-last_date = ld.strftime('%Y-%m-%d')
+    # Get the last date and its corresponding price
+    ld = data.index[-1]
 
-last_price = data['Close'][-1]
+    last_date = ld.strftime('%Y-%m-%d')
 
-def last_p(last_price):
-    y=print(last_price)
+    last_price = data['Close'][-1]
 
-    return y
+    return last_price, last_date
 
-def last_d(last_date):
-    y=print(last_date)
 
-    return y
+print(actualprice("ZC=F"))
