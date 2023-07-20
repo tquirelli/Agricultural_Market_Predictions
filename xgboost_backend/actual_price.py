@@ -8,18 +8,12 @@ import yfinance as yf
 
 def actualprice(tickers):
     ticker = tickers
-
-    # Fetch the historical data for soybean futures
-    data = yf.download(ticker, period="2y",interval="1mo")
-
-    # Get the last date and its corresponding price
+    data = yf.download(ticker, period="2y", interval="1mo")
     ld = data.index[-1]
-
     last_date = ld.strftime('%Y-%m-%d')
-
     last_price = data['Close'][-1]
-
     return last_price, last_date
 
-
-print(actualprice("ZC=F"))
+# price, date = actualprice("ZC=F")
+# print("Last Price:", price)
+# print("Last Date:", date)
