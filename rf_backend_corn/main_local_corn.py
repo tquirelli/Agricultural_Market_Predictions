@@ -3,14 +3,14 @@ import numpy as np
 import pickle
 import os
 from sklearn.model_selection import cross_val_score
-from rf_backend_corn.preprocesador_rf import all_preprocessor
+from rf_backend_corn.preprocesador_rf import all_preprocessor_corn
 from rf_backend_corn.RandomForest import initialize_rf, mape_score
 from dateutil.relativedelta import relativedelta
 
-LOCAL_PATH = 'Agricultural_data/consolidado_soycorn.csv'
-script_path = os.path.dirname(__file__)
-csv_path = os.path.join(script_path, "..", LOCAL_PATH)
-consolidado = pd.read_csv(LOCAL_PATH,parse_dates=["date"],header=0)
+#LOCAL_PATH_rf_corn = '/home/simon/code/tquirelli/Agricultural_Market_Predictions/Agricultural_data/consolidado_soycorn.csv'
+#script_path = os.path.dirname(__file__)
+#csv_path = os.path.join(script_path, "..", LOCAL_PATH_rf_corn)
+#consolidado_rf_corn = pd.read_csv(LOCAL_PATH_rf_corn,parse_dates=["date"],header=0)
 
 def get_new_date(N_month_predict):
     Current_date = pd.Timestamp.now()
@@ -27,9 +27,9 @@ def get_current_date():
     year = Current_date.year
     return int(month), int(year)
 
-def input_usuario(N_month_predict:int, consolidado:pd.DataFrame = consolidado):
+def input_usuario_rf_corn(N_month_predict:int, consolidado_rf_corn):
     # verificar que se encuentre en la base de datos
-    df = all_preprocessor(consolidado) # preprocesando el dataframe completo
+    df = all_preprocessor_corn(consolidado_rf_corn) # preprocesando el dataframe completo
     month_date, year_date = get_new_date(N_month_predict) # obteniendo mes y año actual
     #date = pd.to_datetime(f'{year_date}-{month_date:02d}-01')
     # Sumar los meses a la fecha actual utilizando relativedelta
@@ -39,14 +39,16 @@ def input_usuario(N_month_predict:int, consolidado:pd.DataFrame = consolidado):
     if date in df.index:
         filtered_df = df[df.index == date]
         print(f"✅ data is valid")
-        print(filtered_df.index)
+        print("this is", type(filtered_df))
+        print("this is", filtered_df.index)
+        print("this is", filtered_df.columns)
         return filtered_df, N_month_predict
     else:
         print(f"❌ data is not valid, please try again")
         return "❌ data is not valid, please try again"
 
-def train_rf(consolidado:pd.DataFrame = consolidado) -> pd.DataFrame:
-    df = all_preprocessor(consolidado)
+def train_rf(consolidado_rf_corn) -> pd.DataFrame:
+    df = all_preprocessor_corn(consolidado_rf_corn)
 
     #Scores = {}
     #Results = {}
@@ -84,17 +86,17 @@ def train_rf(consolidado:pd.DataFrame = consolidado) -> pd.DataFrame:
     return model
 
 def save_rf_model(model):
-    model_path = os.path.join(script_path, 'model_rf_corn')
+    model_path = '/home/simon/code/tquirelli/Agricultural_Market_Predictions/rf_backend_corn/model_rf_corn'
     with open(model_path, 'wb') as archivo:
         pickle.dump(model, archivo)
     print("Modelo RF guardado ✅.")
 
 ###
-def predict_rf(filtered_df, N_month_predict):
+def predict_rf_corn(filtered_df, N_month_predict):
     #if meses --> cargar modelo
     User_results = {}
     try:
-        model_path = os.path.join(script_path, 'model_rf_corn')
+        model_path = '/home/simon/code/tquirelli/Agricultural_Market_Predictions/rf_backend_corn/model_rf_corn'
         with open(model_path, 'rb') as archivo:
             load_model = pickle.load(archivo)
         print("Modelo RF cargado exitosamente ✅.")
@@ -106,19 +108,20 @@ def predict_rf(filtered_df, N_month_predict):
         return price_corn_result
 
     except FileNotFoundError:
+        consolidado = '/home/simon/code/tquirelli/Agricultural_Market_Predictions/Agricultural_data/consolidado_soycorn.csv'
         train_rf(consolidado)
 
 ###
-
+'''
 if __name__ == '__main__':
     try:
-        LOCAL_PATH = 'Agricultural_data/consolidado_soycorn.csv'
+        LOCAL_PATH_rf_corn = '/home/simon/code/tquirelli/Agricultural_Market_Predictions/Agricultural_data/consolidado_soycorn.csv'
         script_path = os.path.dirname(__file__)
-        csv_path = os.path.join(script_path, "..", LOCAL_PATH)
-        consolidado = pd.read_csv(csv_path,parse_dates=["date"],header=0)
+        #csv_path = os.path.join(script_path, "..", LOCAL_PATH)
+        consolidado_rf_corn= pd.read_csv(LOCAL_PATH_rf_corn,parse_dates=["date"],header=0)
         N_month_predict = 1
-        filtered_df, N_month_predict = input_usuario(N_month_predict, consolidado)
-        predict_rf(filtered_df, N_month_predict)
+        filtered_df, N_month_predict = input_usuario_corn(N_month_predict, consolidado_rf_corn)
+        predict_rf_corn(filtered_df, N_month_predict)
 
     except:
         import sys
@@ -128,3 +131,5 @@ if __name__ == '__main__':
         extype, value, tb = sys.exc_info()
         traceback.print_exc()
         ipdb.post_mortem(tb)
+        
+'''

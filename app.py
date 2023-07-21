@@ -40,25 +40,50 @@ st.markdown(
 
 st.title("Soybean Price Prediction")
 
+
+
 if st.button("1 Month"):
     time_horizon = "1 Month"
     params = {'time_horizon': time_horizon}
-    url_rf='http://127.0.0.1:8000/predict_1'
+    url_rf='http://127.0.0.1:8000/predict_1_soy'
     prediction_rf = requests.get(url_rf,params=params).json()
     st.header(f'Future Price in a Month:¢/bu {round(prediction_rf,2)}')
 
 if st.button("3 Months"):
     time_horizon = "3 Months"
     params = {'time_horizon': time_horizon}
-    url_xg='http://127.0.0.1:8000/predict_3_6'
+    url_xg='http://127.0.0.1:8000/predict_3_6_soy'
     prediction_xg = requests.get(url_xg,params=params).json()
     st.header(f'Future Price in three Month:¢/bu {prediction_xg}')
     
 if st.button("6 Months"):
     time_horizon = "6 Months"
     params = {'time_horizon': time_horizon}
-    url_xg='http://127.0.0.1:8000/predict_3_6'
+    url_xg='http://127.0.0.1:8000/predict_3_6_soy'
     prediction_xg = requests.get(url_xg,params=params).json()
     st.header(f'Future Price in six Month:¢/bu {(prediction_xg)}')
     
 
+st.title("Soybean Corn Prediction")
+
+if st.button("1 Month"):
+    time_horizon = "1 Month"
+    params = {'time_horizon': time_horizon}
+    url_rf='http://127.0.0.1:8000/predict_1_corn'
+    prediction_rf = requests.get(url_rf,params=params).json()
+    st.header(f'Future Price in a Month:¢/bu {round(prediction_rf,2)}')
+
+if st.button("3 Months"):
+    time_horizon = "3 Months"
+    params = {'time_horizon': time_horizon}
+    url_xg='http://127.0.0.1:8000/predict_3_6_corn'
+    prediction_xg = requests.get(url_xg,params=params).json()
+    st.header(f'Future Price in three Month:¢/bu {prediction_xg}')
+    
+if st.button("6 Months"):
+    time_horizon = "6 Months"
+    params = {'time_horizon': time_horizon}
+    url_xg='http://127.0.0.1:8000/predict_3_6_corn'
+    prediction_xg = requests.get(url_xg,params=params).json()
+    st.header(f'Future Price in six Month:¢/bu {(prediction_xg)}')
+    

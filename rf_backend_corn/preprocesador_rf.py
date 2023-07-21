@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-def all_preprocessor(df) -> pd.DataFrame:
+def all_preprocessor_corn(df) -> pd.DataFrame:
     # Select the desired columns
     df = df[['date', 'price_corn', 'real_interest_rate', 'SP500', 'usa_corn_prod']]
     df=df[df["date"]>="1998-07-01"]
