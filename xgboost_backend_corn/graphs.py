@@ -28,13 +28,17 @@ def graph_corn(prediction,mes, ticker):
 
     # Define the actual price and prediction value
     # actual_price = data['Close'][mes*-1]
-    prediction_value = round(prediction, 2)
+    prediction_value = prediction
 
 
 
     # Add red spot for the predicted value
+    mean_price = data['Close'].mean()
+    plt.axhline(mean_price, color='gray', linestyle='dashed', label='Mean price 2 years')
     plt.scatter(prediction_date, prediction_value, color='red', label=f'{mes} Month Prediction = {prediction_value}')
-    plt.axhline(y=prediction_value, color='gray', linestyle='dashed', alpha=0.5)
+    #plt.axhline(y=prediction_value, color='gray', linestyle='dashed', alpha=0.5)
+
+
 
     # Add legend
     plt.legend()

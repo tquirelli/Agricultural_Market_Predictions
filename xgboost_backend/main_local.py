@@ -12,7 +12,7 @@ from xgboost_backend.XGBoost import initialize_train_model, mape_score, MAPE_val
 #from XGBoost import initialize_train_model, mape_score, MAPE_validation
 
 
-LOCAL_PATH = 'Agricultural_data/consolidado_final1.csv'
+LOCAL_PATH = 'Agricultural_data/consolidado_soycorn.csv'
 script_path = os.path.dirname(__file__)
 csv_path = os.path.join(script_path, "..", LOCAL_PATH)
 

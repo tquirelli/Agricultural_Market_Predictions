@@ -7,7 +7,7 @@ from rf_backend_soy.preprocesador_rf import all_preprocessor
 from rf_backend_soy.RandomForest import initialize_rf, mape_score
 from dateutil.relativedelta import relativedelta
 
-LOCAL_PATH = 'Agricultural_data/consolidado_final.csv'
+LOCAL_PATH = 'Agricultural_data/consolidado_soycorn.csv'
 script_path = os.path.dirname(__file__)
 csv_path = os.path.join(script_path, "..", LOCAL_PATH)
 consolidado = pd.read_csv(LOCAL_PATH,parse_dates=["date"],header=0)

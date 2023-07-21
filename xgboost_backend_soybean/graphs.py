@@ -33,8 +33,13 @@ def graph_soy(prediction,mes, ticker):
 
 
     # Add red spot for the predicted value
+    mean_price = data['Close'].mean()
+    plt.axhline(mean_price, color='gray', linestyle='dashed', label='Mean price 2 years')
     plt.scatter(prediction_date, prediction_value, color='red', label=f'{mes} Month Prediction = {round(int(prediction_value))}')
-    plt.axhline(y=prediction_value, color='gray', linestyle='dashed', alpha=0.5)
+    #plt.axhline(y=prediction_value, color='gray', linestyle='dashed', alpha=0.5)
+
+
+
 
     # Add legend
     plt.legend()

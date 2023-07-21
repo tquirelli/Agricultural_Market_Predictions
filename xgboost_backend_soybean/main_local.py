@@ -10,7 +10,7 @@ from xgboost_backend_soybean.preprocesador import all_preprocessor, all_preproce
 from xgboost_backend_soybean.XGBoot import initialize_train_model, mape_score, MAPE_validation
 
 
-LOCAL_PATH = 'Agricultural_data/consolidado_final1.csv'
+LOCAL_PATH = 'Agricultural_data/consolidado_soycorn.csv'
 script_path = os.path.dirname(__file__)
 csv_path = os.path.join(script_path, "..", LOCAL_PATH)
 
@@ -102,6 +102,7 @@ def predict_xgboost_soybean(filtered_df, N_month_predict):
     #if meses --> cargar modelo
     User_results = {}
     try:
+        script_path = os.path.dirname(__file__)
         model_path = os.path.join(script_path, 'model_XGBoost_{}'.format(N_month_predict))
         with open(model_path, 'rb') as archivo:
             load_model = pickle.load(archivo)
@@ -121,7 +122,7 @@ def predict_xgboost_soybean(filtered_df, N_month_predict):
 
 
 
-if __name__ == '__main__':
+""" if __name__ == '__main__':
     try:
         LOCAL_PATH = 'Agricultural_data/consolidado_soycorn.csv'
         script_path = os.path.dirname(__file__)
@@ -138,4 +139,4 @@ if __name__ == '__main__':
         import ipdb
         extype, value, tb = sys.exc_info()
         traceback.print_exc()
-        ipdb.post_mortem(tb)
+        ipdb.post_mortem(tb) """
