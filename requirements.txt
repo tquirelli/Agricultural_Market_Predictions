@@ -113,3 +113,6 @@ webcolors==1.13
 webencodings==0.5.1
 websocket-client==1.6.0
 wrapt==1.15.0
+xgboost_ray
+xgboost
+yfinance
