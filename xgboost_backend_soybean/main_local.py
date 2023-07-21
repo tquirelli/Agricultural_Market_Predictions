@@ -6,8 +6,8 @@ import seaborn as sns
 import pickle
 import os
 from dateutil.relativedelta import relativedelta
-from preprocesador import all_preprocessor, all_preprocessor_train
-from XGBoot import initialize_train_model, mape_score, MAPE_validation
+from xgboost_backend_soybean.preprocesador import all_preprocessor, all_preprocessor_train
+from xgboost_backend_soybean.XGBoot import initialize_train_model, mape_score, MAPE_validation
 
 
 LOCAL_PATH = 'Agricultural_data/consolidado_final1.csv'
@@ -26,7 +26,7 @@ def get_current_date(N_month_predict):
     return int(month), int(year)
 
 
-def input_usuario(N_month_predict:int, consolidado:pd.DataFrame = consolidado):
+def input_usuario_xgboost_soybean(N_month_predict:int, consolidado):
     # verificar que se encuentre en la base de datos
     df = all_preprocessor(consolidado) # preprocesando el dataframe completo
     month_date, year_date = get_current_date(N_month_predict) # obteniendo mes y año actual
@@ -57,7 +57,7 @@ def feature_selection(df, N_month_predict):
     Variables['X_{}'.format(N_month_predict)] = df[Selected_features]
     return Variables
 
-def train_xgboost(N_month_predict, consolidado:pd.DataFrame = consolidado) -> pd.DataFrame:
+def train_xgboost(N_month_predict, consolidado) -> pd.DataFrame:
     df = all_preprocessor_train(consolidado)
     # Choose 90% of the rows randomly
     # df = df.sample(frac=0.9, random_state=42)
@@ -98,7 +98,7 @@ def save_xgboot_model(model, N_month_predict):
     print("Modelo XGBoost guardado ✅.")
 
 
-def predict_xgboost(filtered_df, N_month_predict):
+def predict_xgboost_soybean(filtered_df, N_month_predict):
     #if meses --> cargar modelo
     User_results = {}
     try:

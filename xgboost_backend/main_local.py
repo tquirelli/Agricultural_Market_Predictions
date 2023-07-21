@@ -6,15 +6,17 @@ import seaborn as sns
 import pickle
 import os
 from dateutil.relativedelta import relativedelta
-from preprocesador import all_preprocessor, all_preprocessor_train
-from XGBoot import initialize_train_model, mape_score, MAPE_validation
+from xgboost_backend.preprocesador import all_preprocessor, all_preprocessor_train
+from xgboost_backend.XGBoost import initialize_train_model, mape_score, MAPE_validation
+#from preprocesador import all_preprocessor, all_preprocessor_train
+#from XGBoost import initialize_train_model, mape_score, MAPE_validation
 
 
 LOCAL_PATH = 'Agricultural_data/consolidado_final1.csv'
 script_path = os.path.dirname(__file__)
 csv_path = os.path.join(script_path, "..", LOCAL_PATH)
 
-consolidado = pd.read_csv(LOCAL_PATH)
+consolidado = pd.read_csv(csv_path)
 
 def get_current_date(N_month_predict):
     Current_date = pd.Timestamp.now()
@@ -26,7 +28,7 @@ def get_current_date(N_month_predict):
     return int(month), int(year)
 
 
-def input_usuario(N_month_predict:int, consolidado:pd.DataFrame = consolidado):
+def input_usuario(N_month_predict:int, consolidado):
     # verificar que se encuentre en la base de datos
     df = all_preprocessor(consolidado) # preprocesando el dataframe completo
     month_date, year_date = get_current_date(N_month_predict) # obteniendo mes y año actual
@@ -57,7 +59,7 @@ def feature_selection(df, N_month_predict):
     Variables['X_{}'.format(N_month_predict)] = df[Selected_features]
     return Variables
 
-def train_xgboost(N_month_predict, consolidado:pd.DataFrame = consolidado) -> pd.DataFrame:
+def train_xgboost(N_month_predict, consolidado) -> pd.DataFrame:
     df = all_preprocessor_train(consolidado)
     # Choose 90% of the rows randomly
     # df = df.sample(frac=0.9, random_state=42)
@@ -121,7 +123,7 @@ def predict_xgboost(filtered_df, N_month_predict):
 
 
 
-if __name__ == '__main__':
+""" if __name__ == '__main__':
     try:
         LOCAL_PATH = 'Agricultural_data/consolidado_final1.csv'
         script_path = os.path.dirname(__file__)
@@ -138,4 +140,4 @@ if __name__ == '__main__':
         import ipdb
         extype, value, tb = sys.exc_info()
         traceback.print_exc()
-        ipdb.post_mortem(tb)
+        ipdb.post_mortem(tb) """
