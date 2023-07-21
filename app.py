@@ -1,89 +1,118 @@
 import streamlit as st
-import requests
-import numpy as np
+from model import predict_price_soybean, predict_price_corn
+import matplotlib.pyplot as plt
 import pandas as pd
-import streamlit as st
-from xgboost_backend.XGBoot import predict_price
-from PIL import Image
-import base64
-import streamlit as st
-
-
+import datetime
+from xgboost_backend_soybean.actual_price import actualprice
+from xgboost_backend_soybean.graphs import graph_soy
+from xgboost_backend_corn.graphs import graph_corn
+from rf_backend_corn.graphs import graph_corn_1month
+from rf_backend_soy.graphs import graph_soy_1month
+##last_price, last_date
 
 st.set_page_config(
-    page_title="Agricultural Market Prediction",
-    page_icon="🌐",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    page_title="Ex-stream-ly Cool App",
+    page_icon="🧊",
+    #layout="wide",
+    initial_sidebar_state="expanded",
+    menu_items={
+        'Get Help': 'https://www.extremelycoolapp.com/help',
+        'Report a bug': "https://www.extremelycoolapp.com/bug",
+        'About': "## This is a header. This is an *extremely* cool app!"
+    }
 )
 
-st.markdown(
-    """
-    <style>
-    body {
-        background-image:url('https://www.infocampo.com.ar/wp-content/uploads/2020/01/agricultura-soja-infocampo.jpg');
-        background-size: cover;
-        background-repeat: no-repeat;
-    }
+# Streamlit app code
+last_price_soy, last_date_soy, data_soy_finance = actualprice(("ZS=F"))
+last_price_corn, last_date_corn, data_corn_finance = actualprice(("ZC=F"))
+ticker_soy = "ZS=F"
+ticker_corn = "ZC=F"
+st.title('Welcome to :green[AgrIcast] :seedling::ear_of_rice:')
+st.header("Choose an option to predict the price")
+#btn = st.button("Press Me")
 
-    .main-container {
-        padding: 4rem;
-        color: white;
-        text-align: center;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+page_names = ['Soybean Price', 'Corn Price']
+page = st.radio('Navigation', page_names)
+if page == 'Soybean Price':
+    st.header("Soybean Price Prediction")
+    st.header(f'_Last_ _month_ _price_ _from_ {last_date_soy} _is_ $*{int(last_price_soy)}*')
 
+    if st.button("1 Month"):
+        prediction_horizon = "1 Month"
 
+    if st.button("3 Months"):
+        prediction_horizon = "3 Months"
 
-st.title("Soybean Price Prediction")
+    if st.button("6 Months"):
+        prediction_horizon = "6 Months"
 
+    # Predict and display the message if a time horizon is selected
+    if 'prediction_horizon' in locals():
+        prediction = predict_price_soybean(prediction_horizon)
+        st.subheader(f"Predicted Soybean Price for {prediction_horizon}:")
+        #st.write(f'#{str(prediction)}') #2772db;
+        html_str = f"""
+        <style>
+        p.a {{
+            font: bolder 30px sans-serif;
+            color: #388e3c;
+            background-color: #eaeaea;
+            text-align: center;
+            }}
+        </style>
+        <p class="a">{prediction}</p>"""
+        st.markdown(html_str, unsafe_allow_html=True)
+        if prediction_horizon == "1 Month":
+            graph = graph_soy_1month(prediction, prediction_horizon, ticker_soy)
+            st.set_option('deprecation.showPyplotGlobalUse', False)
+            st.pyplot(graph)
+        elif prediction_horizon == "3 Months":
+            prediction_1month = predict_price_soybean("1 Month")
+            graph = graph_soy(prediction, prediction_horizon, ticker_soy)
+            prediction_date = datetime.date.today() + datetime.timedelta(days=30)
+            plt.scatter(prediction_date, prediction_1month, color='blue', label=f'1 Month Prediction = ${prediction_1month}')
+            last_date = data_soy_finance.index[-1]
+            plt.plot([last_date, prediction_date], [data_soy_finance['Close'].iloc[-1], prediction], 'r--')
+            st.set_option('deprecation.showPyplotGlobalUse', False)
+            st.pyplot(graph)
 
+elif page == 'Corn Price':
+    st.header("Corn Price Prediction")
+    st.header(f'Last month price from {last_date_corn} is ${int(last_price_corn)}')
 
-if st.button("1 Month"):
-    time_horizon = "1 Month"
-    params = {'time_horizon': time_horizon}
-    url_rf='http://127.0.0.1:8000/predict_1_soy'
-    prediction_rf = requests.get(url_rf,params=params).json()
-    st.header(f'Future Price in a Month:¢/bu {round(prediction_rf,2)}')
+    if st.button("1 Month"):
+        prediction_horizon = "1 Month"
 
-if st.button("3 Months"):
-    time_horizon = "3 Months"
-    params = {'time_horizon': time_horizon}
-    url_xg='http://127.0.0.1:8000/predict_3_6_soy'
-    prediction_xg = requests.get(url_xg,params=params).json()
-    st.header(f'Future Price in three Month:¢/bu {prediction_xg}')
-    
-if st.button("6 Months"):
-    time_horizon = "6 Months"
-    params = {'time_horizon': time_horizon}
-    url_xg='http://127.0.0.1:8000/predict_3_6_soy'
-    prediction_xg = requests.get(url_xg,params=params).json()
-    st.header(f'Future Price in six Month:¢/bu {(prediction_xg)}')
-    
+    if st.button("3 Months"):
+        prediction_horizon = "3 Months"
 
-st.title("Soybean Corn Prediction")
+    if st.button("6 Months"):
+        prediction_horizon = "6 Months"
 
-if st.button("1 Month"):
-    time_horizon = "1 Month"
-    params = {'time_horizon': time_horizon}
-    url_rf='http://127.0.0.1:8000/predict_1_corn'
-    prediction_rf = requests.get(url_rf,params=params).json()
-    st.header(f'Future Price in a Month:¢/bu {round(prediction_rf,2)}')
-
-if st.button("3 Months"):
-    time_horizon = "3 Months"
-    params = {'time_horizon': time_horizon}
-    url_xg='http://127.0.0.1:8000/predict_3_6_corn'
-    prediction_xg = requests.get(url_xg,params=params).json()
-    st.header(f'Future Price in three Month:¢/bu {prediction_xg}')
-    
-if st.button("6 Months"):
-    time_horizon = "6 Months"
-    params = {'time_horizon': time_horizon}
-    url_xg='http://127.0.0.1:8000/predict_3_6_corn'
-    prediction_xg = requests.get(url_xg,params=params).json()
-    st.header(f'Future Price in six Month:¢/bu {(prediction_xg)}')
-    
+    # Predict and display the message if a time horizon is selected
+    if 'prediction_horizon' in locals():
+        prediction = predict_price_corn(prediction_horizon)
+        st.subheader(f"Predicted Corn Price for {prediction_horizon}:")
+        #st.write(prediction)
+        html_str = f"""
+        <style>
+        p.a {{
+            font: bolder 30px sans-serif;
+            color: #2772db;
+            background-color: #eaeaea;
+            text-align: center;
+            }}
+        </style>
+        <p class="a">{prediction}</p>"""
+        st.markdown(html_str, unsafe_allow_html=True)
+        if prediction_horizon == "1 Month":
+            graph = graph_corn_1month(prediction, prediction_horizon, ticker_corn)
+            st.set_option('deprecation.showPyplotGlobalUse', False)
+            st.pyplot(graph)
+        else:
+            graph = graph_corn(prediction, prediction_horizon, ticker_corn)
+            st.set_option('deprecation.showPyplotGlobalUse', False)
+            st.pyplot(graph)
+else:
+    st.write('Invalid Option"')
+# graph_soy(prediction,mes)    
