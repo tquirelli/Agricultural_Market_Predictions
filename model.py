@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, '/xgboost_backend')
+#sys.path.insert(0, '/xgboost_backend')
 from xgboost_backend_soybean.main_local import input_usuario_xgboost_soybean, predict_xgboost_soybean
 from xgboost_backend_corn.main_local import input_usuario_xgboost_corn, predict_xgboost_corn
 from rf_backend_corn.main_local import input_usuario_rf_corn, predict_rf_corn
