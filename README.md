@@ -4,12 +4,15 @@ The following project was born with the intention of offering a tool or platform
 
 The goal is to predict the prices of agricultural products using machine learning tools and data analysis, obtaining highly useful forecasts for farmers, traders, and market participants. The 3 target prediction horizons are 1, 3, and 6 months.
 
+![Alt text](image-1.png)(image.png)
+
 ### Data Collection ###
 
 Our sources for collecting data were:
 
 TraidingView Platform
 USDA: United States Department of Agriculture.
+
 
 ### Data Cleaning and Data Preparation ###
 
@@ -25,10 +28,8 @@ Real interest rate USA
 
 Based on the preceding steps and in line with the proposed objectives (horizons and type of prediction), we carried out tests and training of different predictive models, seeking those that achieve the best performance and metrics, while considering techniques to prevent overfitting and data leakage.
 
-The selected models are:
+![Alt text](image-2.png)
 
-For the 1-month predictive horizon: RandomForest
-For the 3 and 6-month predictive horizons: XGBoost
 
 ### Performance Evaluation and Metrics ###
 
@@ -44,4 +45,12 @@ For our project, we used Streamlit, a Python library that allows us to deploy an
 
 ### We invite you to visualize and enjoy ###
 
-https://agriculturalmarketpredictions-project.streamlit.app/
+Streamlit: https://agriculturalmarketpredictions-project.streamlit.app/About_the_project
+Github : https://agriculturalmarketpredictions-project.streamlit.app/
+
+
+
+### Our Team ###
+
+
+![Alt text](image-3.png)
