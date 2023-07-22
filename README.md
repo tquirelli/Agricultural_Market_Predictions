@@ -35,6 +35,9 @@ For the 3 and 6-month predictive horizons: XGBoost
 We conducted performance evaluations and calculated various metrics to validate the accuracy of the selected models.
 
 
+
+
+
 ### Deployment and User Interface ###
 
 For our project, we used Streamlit, a Python library that allows us to deploy and put our model into use in a very simple way.
