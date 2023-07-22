@@ -44,7 +44,7 @@ if page == 'Soybean Price':
         prediction = round(predict_price_soybean(prediction_horizon),2)
         #st.write(f'#{str(prediction)}') #2772db ; #388e3c;
         if int(prediction) >= int(last_price_soy):
-            st.subheader(f"Predicted Soybean Price for {prediction_horizon}:  :arrow_up: ")
+            st.subheader(f"Predicted Soybean Price for {round(float(prediction),2)}:  :arrow_up: ")
             html_str = f"""
             <style>
             p.a {{
@@ -54,9 +54,9 @@ if page == 'Soybean Price':
                 text-align: center;
                 }}
             </style>
-            <p class="a">${prediction}</p>"""
+            <p class="a">${round(float(prediction),2)}</p>"""
         else:
-            st.subheader(f"Predicted Soybean Price for {prediction_horizon}:  :arrow_down: ")
+            st.subheader(f"Predicted Soybean Price for {round(float(prediction),2)}:  :arrow_down: ")
             html_str = f"""
             <style>
             p.a {{
@@ -127,7 +127,7 @@ elif page == 'Corn Price':
     if 'prediction_horizon' in locals():
         prediction = round(predict_price_corn(prediction_horizon),2)
         if int(prediction) >= int(last_price_corn):
-            st.subheader(f"Predicted Corn Price for {prediction_horizon}:  :arrow_up: ")
+            st.subheader(f"Predicted Corn Price for {round(float(prediction),2)}:  :arrow_up: ")
             #st.write(prediction)
             html_str = f"""
             <style>
@@ -140,7 +140,7 @@ elif page == 'Corn Price':
             </style>
             <p class="a">${round(float(prediction),2)}</p>"""
         else:
-            st.subheader(f"Predicted Corn Price for {prediction_horizon}:  :arrow_down: ")
+            st.subheader(f"Predicted Corn Price for {round(float(prediction),2)}:  :arrow_down: ")
             #st.write(prediction)
             html_str = f"""
             <style>
@@ -151,7 +151,7 @@ elif page == 'Corn Price':
                 text-align: center;
                 }}
             </style>
-            <p class="a">${prediction}</p>"""
+            <p class="a">${round(float(prediction),2)}</p>"""
         st.markdown(html_str, unsafe_allow_html=True)
         if prediction_horizon == "1 Month":
             graph = graph_corn_1month(prediction, prediction_horizon, ticker_corn)
