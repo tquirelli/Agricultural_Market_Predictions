@@ -6,7 +6,8 @@ import streamlit as st
 
 def graph_corn(prediction,mes, ticker):
 
-    data = yf.download(ticker, period="2y")
+    data = yf.download(ticker, period="2y", interval='1d')
+    data = data[data.index <= "2023-06-30"]
     sns.set(style="darkgrid")
 
 
@@ -17,8 +18,8 @@ def graph_corn(prediction,mes, ticker):
     plt.ylabel('Price')
 
     # Calculate today's date
-    today_date = datetime.date.today()
-    # Start = datetime.date.today() - datetime.timedelta(365)
+    #today_date = datetime.date.today()
+    today_date = datetime.date(2023, 6, 30)
 
     # Calculate prediction date as today's date plus 1 month
     if mes == '3 Months':
@@ -28,14 +29,14 @@ def graph_corn(prediction,mes, ticker):
 
     # Define the actual price and prediction value
     # actual_price = data['Close'][mes*-1]
-    prediction_value = prediction
+    prediction_value = round(prediction)
 
 
 
     # Add red spot for the predicted value
     mean_price = data['Close'].mean()
     plt.axhline(mean_price, color='gray', linestyle='dashed', label='Mean price 2 years')
-    plt.scatter(prediction_date, prediction_value, color='red', label=f'{mes} Month Prediction = {prediction_value}')
+    plt.scatter(prediction_date, prediction_value, color='red', label=f'{mes} Prediction = ${prediction_value}')
     #plt.axhline(y=prediction_value, color='gray', linestyle='dashed', alpha=0.5)
 
 

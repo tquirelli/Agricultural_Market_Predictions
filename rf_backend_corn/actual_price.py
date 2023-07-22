@@ -9,7 +9,7 @@ def actualprice(tickers):
     ticker = tickers
 
     # Fetch the historical data for soybean futures
-    data = yf.download(ticker, period="2y",interval="1mo")
+    data = yf.download(ticker, period="2y",interval="1d")
 
     # Get the last date and its corresponding price
     ld = data.index[-1]
