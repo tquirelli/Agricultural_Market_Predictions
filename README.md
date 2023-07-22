@@ -37,8 +37,6 @@ We conducted performance evaluations and calculated various metrics to validate 
 
 
 
-
-
 ### Deployment and User Interface ###
 
 For our project, we used Streamlit, a Python library that allows us to deploy and put our model into use in a very simple way.
@@ -46,8 +44,8 @@ For our project, we used Streamlit, a Python library that allows us to deploy an
 ### We invite you to visualize and enjoy ###
 
 Streamlit: https://agriculturalmarketpredictions-project.streamlit.app/About_the_project
-Github : https://agriculturalmarketpredictions-project.streamlit.app/
 
+Github : https://agriculturalmarketpredictions-project.streamlit.app/
 
 
 ### Our Team ###
